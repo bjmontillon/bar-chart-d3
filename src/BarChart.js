@@ -47,7 +47,24 @@ function Barchart() {;
                 .attr('x', (value, index) => xScale(index))
                 .attr('y', -150)
                 .attr('width', xScale.bandwidth(xScale))
-                .transition(0.3)
+                .on("mouseenter", (event, value) => {
+                    // events have changed in d3 v6:
+                    // https://observablehq.com/@d3/d3v6-migration-guide#events
+                    const index = svg.selectAll(".bar").nodes().indexOf(event.target);
+                    svg
+                      .selectAll(".tooltip")
+                      .data([value])
+                      .join((enter) => enter.append("text").attr("y", yScale(value) - 4))
+                      .attr("class", "tooltip")
+                      .text(value)
+                      .attr("x", xScale(index) + xScale.bandwidth() / 2)
+                      .attr("text-anchor", "middle")
+                      .transition()
+                      .attr("y", yScale(value) - 8)
+                      .attr("opacity", 1);
+                  })
+                  .on("mouseleave", () => svg.select(".tooltip").remove())
+                .transition()
                 .attr('fill', colorScale)
                 .attr('height', value => 150 - yScale(value));
 
@@ -69,6 +86,9 @@ function Barchart() {;
             <button onClick={() => setData(data.filter(value => value < 35))}>
             Filter data
             </button>
+            <button onClick={() => setData([...data, Math.round(Math.random() * 100)])}>
+            Add data
+      </button>
         </React.Fragment>
     )
 }
