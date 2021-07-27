@@ -1,29 +1,59 @@
 import React, { useEffect, useRef, useState } from 'react'
 import './App.css';
-import { select, line, curveCardinal } from 'd3'
+import { select, line, curveCardinal, scaleLinear, axisBottom, axisRight } from 'd3'
 
 
 
 
 function App() {
 
-  const [data, setData] = useState([10, 20, 25, 30, 60 , 50]);
-
+  const [data, setData] = useState([10, 50, 25, 30, 60 , 50]);
   const svgRef = useRef();
+ 
+
+
 
   useEffect(() => {
 
     const svg = select(svgRef.current);
+
+    //Axes
+
+    const xScale = scaleLinear()
+        .domain([0, data.length - 1])
+        .range([0, 300]);
+
+    const yScale = scaleLinear()
+        .domain([0, 150])
+        .range([150, 0]);
+
+    
+    const xAxis = axisBottom(xScale).ticks(data.length).tickFormat(index => index + 1);
+      svg
+        .select('.x-Axis')
+        .call(xAxis)
+        .style('transform', 'translateY(150px)');
+
+    const yAxis = axisRight(yScale);
+      svg
+      .select('.y-Axis')
+      .call(yAxis)
+      .style('transform', 'translateX(300px)');
+
+    //Chart
+      
     const myLine = line()
-        .x((value, index) => index * 50)
-        .y(value => 150 - value)
-        .curve(curveCardinal);
-        svg.selectAll('path')
-        .data([data])
-        .join('path')
-        .attr('d', value => myLine(value))
-        .attr('fill', 'none')
-        .attr('stroke', 'blue');
+      .x((value, index) => xScale(index))
+      .y(yScale)
+      .curve(curveCardinal);
+
+      svg.selectAll('.line')
+      .data([data])
+      .join('path')
+      .attr('class', 'line')
+      .attr('d', value => myLine(value))
+      .attr('fill', 'none')
+      .attr('stroke', 'blue');
 
     // svg.selectAll('circle')
     //     .data(data)
@@ -38,17 +68,21 @@ function App() {
   }, [data])
   return (
     <React.Fragment>
-    <svg ref={ svgRef }>
-      <path d='' stroke='red' fill='none' />
-    </svg>
-    <br />
-    <button onClick={() => setData(data.map(value => value + 5))}>
-    Update data
-    </button>
-    <button onClick={() => setData(data.filter(value => value < 35))}>
-    Filter data
-    </button>
-    
+    <h1>Line</h1>
+        <svg ref={ svgRef }>
+          <g className='x-Axis' />
+          <g className='y-Axis' />
+
+        </svg>
+        <br />
+        <br />
+        <button onClick={() => setData(data.map(value => value + 5))}>
+        Update data
+        </button>
+        <button onClick={() => setData(data.filter(value => value < 35))}>
+        Filter data
+        </button>
+        
     </React.Fragment>
   );
 }

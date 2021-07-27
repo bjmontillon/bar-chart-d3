@@ -2,11 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import Barchart from './BarChart'
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+  <div className='mainContainer'>
+    <div><App /></div>
+    <div><Barchart /></div>
+  </div>
   </React.StrictMode>,
   document.getElementById('root')
 );
